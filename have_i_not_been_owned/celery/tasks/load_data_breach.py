@@ -20,8 +20,8 @@ _SUPPORTED_EXTENSIONS = ('.txt',)
 _MAX_BULK_SIZE = 100_000
 
 
-@shared_task(bind=True)
-def load_data_breach(_, *, source: dict, breach: dict):
+@shared_task
+def load_data_breach(*, source: dict, breach: dict):
 
     source_url = source['url']
 
