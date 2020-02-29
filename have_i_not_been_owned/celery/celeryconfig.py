@@ -6,7 +6,7 @@ result_backend = os.getenv('HINBO_RESULT_BACKEND', 'redis://localhost:6379/0')
 accept_content = ["json"]
 task_serializer = "json"
 
-# Ensure that tasks are not lost if workers die or exit (OOM, SIGTERM, SIGKILL)
+# Ensure that celery are not lost if workers die or exit (OOM, SIGTERM, SIGKILL)
 task_track_started = True
 task_acks_late = True
 task_reject_on_worker_lost = True

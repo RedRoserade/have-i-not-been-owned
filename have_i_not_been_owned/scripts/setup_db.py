@@ -7,6 +7,7 @@ def main():
 
     _setup_data_breaches_collection(db)
     _setup_breached_email_domains_collection(db)
+    _setup_breaches_collection(db)
 
 
 def _setup_data_breaches_collection(db):
@@ -38,7 +39,7 @@ def _setup_breaches_collection(db):
     coll = get_data_breaches_collection(db)
 
     coll.create_index(
-        keys=[('domain', 1)],
+        keys=[('id', 1)],
         unique=True,
         name='domain_asc_unique'
     )

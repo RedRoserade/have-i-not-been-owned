@@ -20,8 +20,10 @@ _SUPPORTED_EXTENSIONS = ('.txt',)
 _MAX_BULK_SIZE = 100_000
 
 
-@shared_task
-def load_data_breach(*, source_url: str, breach: dict):
+@shared_task(bind=True)
+def load_data_breach(_, *, source: dict, breach: dict):
+
+    source_url = source['url']
 
     _, ext = os.path.splitext(urlparse(source_url).path)
 
@@ -31,13 +33,15 @@ def load_data_breach(*, source_url: str, breach: dict):
     breach_file = _download_breach_file(ext, source_url)
 
     try:
-        return _process_breach_file(breach_file, breach['name'])
+        return _process_breach_file(breach_file, breach)
     finally:
         if os.path.isfile(breach_file):
             os.remove(breach_file)
 
 
-def _process_breach_file(breach_file: str, breach_name: str):
+def _process_breach_file(breach_file: str, breach: dict):
+
+    breach_id = breach['id']
 
     db = get_db()
 
@@ -47,10 +51,11 @@ def _process_breach_file(breach_file: str, breach_name: str):
     # Use MongoDB's bulk operations to reduce the number of database accesses, at the cost of memory usage.
     email_address_bulk = []
 
+    # Kept for statistics purposes.
     email_totals = Counter()
     domain_totals = Counter()
 
-    # The number of distinct domains will be far fewer than the number of emails processed.
+    # The number of distinct domains will be less than the number of emails processed.
     # So, use a Set for storing the distinct domains, and flush it as it exceeds a given size.
     domains_cache = set()
 
@@ -64,7 +69,7 @@ def _process_breach_file(breach_file: str, breach_name: str):
                     # queries would have to be applied on the email collection,
                     # which could be costly, even with indexes.
                     '$addToSet': {
-                        'breaches': breach_name,
+                        'breaches': breach_id,
                     },
                     '$setOnInsert': {'domain': domain},
                 },
@@ -81,8 +86,6 @@ def _process_breach_file(breach_file: str, breach_name: str):
         )
 
     def dump_emails():
-        return
-
         result = breached_emails.bulk_write(email_address_bulk, ordered=False)
 
         email_totals.update(
@@ -105,7 +108,7 @@ def _process_breach_file(breach_file: str, breach_name: str):
                     {'email': normalized_email['email']},
                     {
                         '$addToSet': {
-                            'breaches': breach_name,
+                            'breaches': breach_id,
                         },
                         '$setOnInsert': normalized_email,
                     },

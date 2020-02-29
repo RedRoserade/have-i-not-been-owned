@@ -6,6 +6,69 @@ info:
 servers:
   - url: /api/v1
 paths:
+  /data_breaches/upload_url:
+    post:
+      x-openapi-router-controller: have_i_not_been_owned.api.controllers.data_breaches_controller
+      operationId: prepare_data_breach_upload_url
+      description: Prepare an upload URL for a data breach
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PrepareDataBreachUploadUrlRequestBody'
+      responses:
+        200:
+          description: Upload URL with parameters.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  post:
+                    $ref: '#/components/schemas/PresignedPostUrl'
+                  get:
+                    description: Pass this URL to `process_data_breach`.
+                    type: string
+                required:
+                  - post
+                  - get
+  /data_breaches:
+    post:
+      x-openapi-router-controller: have_i_not_been_owned.api.controllers.data_breaches_controller
+      operationId: process_data_breach
+      description: Process a data breach from a URL with data.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProcessDataBreachRequestBody'
+      responses:
+        202:
+          description: Data breach processing accepted.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskStatus'
+  /tasks/{task_id}:
+    get:
+      x-openapi-router-controller: have_i_not_been_owned.api.controllers.tasks_controller
+      operationId: get_task_status
+      description: Get the status of a Task. Note that this will return `PENDING` for celery that don't exist or haven't started yet.
+      parameters:
+        - name: task_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Task status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskStatus'
   /breached_emails/{email}:
     get:
       x-openapi-router-controller: have_i_not_been_owned.api.controllers.breached_emails_controller
@@ -36,17 +99,20 @@ paths:
       operationId: get_breached_domain
       parameters:
         - name: domain
+          description: Domain to search for.
           in: path
           required: true
           schema:
             type: string
         - name: after
+          description: ID after which to start returning breached emails.
           in: query
           required: false
           schema:
             type: string
             format: objectid
         - name: limit
+          description: Pagination limit.
           in: query
           required: false
           schema:
@@ -72,20 +138,46 @@ components:
   schemas:
     Problem:
       type: object
+      description: A RFC 7807-derived response describing an error.
+      properties:
+        type:
+          type: string
+        title:
+          type: string
+        detail:
+          type: string
+        status:
+          type: integer
+      additionalProperties: true
+      example:
+        type: "ExampleError"
+        title: "An example title"
+        detail: "A descriptive message."
+        status: 500
+        may_have_extra_fields: true
     DataBreach:
       type: object
+      description: Information about a data breach.
       properties:
         id:
           type: string
+        name:
+          type: string
+        inserted_at:
+          type: string
+          format: datetime
       required:
         - id
     BreachedEmail:
       type: object
+      description: Information about a breached email.
       properties:
         _id:
+          description: ID of the email. Should be used for pagination.
           type: string
           format: objectid
         breaches:
+          description: Breaches on which this email appears.
           type: array
           items:
             $ref: '#/components/schemas/DataBreach'
@@ -95,12 +187,15 @@ components:
       type: object
       properties:
         breaches:
+          description: Breaches on which this domain appears.
           type: array
           items:
             $ref: '#/components/schemas/DataBreach'
         total_emails:
+          description: The total number of emails for this domain.
           type: integer
         emails_page:
+          description: Page with email addresses for this domain.
           type: array
           items:
             $ref: '#/components/schemas/BreachedEmail'
@@ -108,3 +203,58 @@ components:
         - total_emails
         - emails_page
         - breaches
+    ProcessDataBreachRequestBody:
+      type: object
+      properties:
+        breach_source:
+          type: object
+          properties:
+            url:
+              type: string
+            # Reserved for other possibly required fields, such as headers.
+          required:
+            - url
+        breach:
+          type: object
+          properties:
+            name:
+              type: string
+          required:
+            - name
+      required:
+        - breach_source
+        - breach
+    TaskStatus:
+      type: object
+      properties:
+        task_id:
+          type: string
+        task_state:
+          type: string
+      required:
+        - task_id
+        - task_state
+    PresignedPostUrl:
+      type: object
+      properties:
+        url:
+          type: string
+        fields:
+          type: object
+          properties:
+            key:
+              type: string
+          additionalProperties: true
+          required:
+            - key
+      required:
+        - url
+        - fields
+    PrepareDataBreachUploadUrlRequestBody:
+      type: object
+      properties:
+        file_name:
+          type: string
+          pattern: '\.txt$'
+      required:
+        - file_name

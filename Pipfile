@@ -10,6 +10,7 @@ connexion = {extras = ["swagger-ui"],version = "*"}
 celery = {extras = ["redis"],version = "*"}
 requests = "*"
 pymongo = "*"
+boto3 = "*"
 
 [requires]
 python_version = "3.7"
