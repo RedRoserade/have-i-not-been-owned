@@ -6,6 +6,10 @@ verify_ssl = true
 [dev-packages]
 
 [packages]
+connexion = {extras = ["swagger-ui"],version = "*"}
+celery = {extras = ["redis"],version = "*"}
+requests = "*"
+pymongo = "*"
 
 [requires]
 python_version = "3.7"
