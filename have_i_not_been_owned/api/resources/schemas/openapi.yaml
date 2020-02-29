@@ -1,6 +1,7 @@
 openapi: 3.0.0
 info:
-  title: Have I not Been Owned
+  title: Have I not Been Owned API
+  description: An API where you actually want to receive 404s from (well, on some endpoints anyway)
   version: 0.1.0
 servers:
   - url: /api/v1
@@ -22,14 +23,14 @@ paths:
           content:
             application/json:
               schema:
-                type: object
+                $ref: '#/components/schemas/BreachedEmail'
         404:
           description: Email not present in any data breaches
           content:
             application/json:
               schema:
-                type: object
-  /domains/{domain}:
+                $ref: '#/components/schemas/Problem'
+  /email_domains/{domain}:
     get:
       x-openapi-router-controller: have_i_not_been_owned.api.controllers.breached_emails_controller
       operationId: get_breached_domain
@@ -39,16 +40,71 @@ paths:
           required: true
           schema:
             type: string
+        - name: after
+          in: query
+          required: false
+          schema:
+            type: string
+            format: objectid
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 100
       responses:
         200:
-          description: Information about the breached email
+          description: Information about the breached emails in the requested domain
           content:
             application/json:
               schema:
-                type: object
+                $ref: '#/components/schemas/BreachedEmailDomain'
         404:
-          description: Email not present in any data breaches
+          description: Email domain not present in any data breaches
           content:
             application/json:
               schema:
-                type: object
+                $ref: '#/components/schemas/Problem'
+
+components:
+  schemas:
+    Problem:
+      type: object
+    DataBreach:
+      type: object
+      properties:
+        id:
+          type: string
+      required:
+        - id
+    BreachedEmail:
+      type: object
+      properties:
+        _id:
+          type: string
+          format: objectid
+        breaches:
+          type: array
+          items:
+            $ref: '#/components/schemas/DataBreach'
+      required:
+        - breaches
+    BreachedEmailDomain:
+      type: object
+      properties:
+        breaches:
+          type: array
+          items:
+            $ref: '#/components/schemas/DataBreach'
+        total_emails:
+          type: integer
+        emails_page:
+          type: array
+          items:
+            $ref: '#/components/schemas/BreachedEmail'
+      required:
+        - total_emails
+        - emails_page
+        - breaches

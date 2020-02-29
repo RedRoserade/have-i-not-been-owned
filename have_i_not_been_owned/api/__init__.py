@@ -2,6 +2,9 @@ import os
 
 import connexion
 
+# Import formats for validation
+import have_i_not_been_owned.api.formats
+
 _cwd = os.path.abspath(os.path.dirname(__file__))
 
 connexion_app = connexion.FlaskApp(__name__, specification_dir=os.path.join(_cwd, 'resources', 'schemas'))
