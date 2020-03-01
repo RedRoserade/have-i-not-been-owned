@@ -1,3 +1,4 @@
+import logging
 import os
 import uuid
 from datetime import datetime
@@ -14,6 +15,8 @@ from have_i_not_been_owned.common.config import cos
 from have_i_not_been_owned.common.db import get_data_breaches_collection
 from have_i_not_been_owned.common.s3 import create_presigned_post, create_presigned_url
 from have_i_not_been_owned.common.utils.text import slugify
+
+logger = logging.getLogger(__name__)
 
 
 def prepare_data_breach_upload_url(body):
@@ -52,10 +55,13 @@ def process_data_breach(body):
     try:
         data_breaches.insert_one(breach)
     except DuplicateKeyError:
+        logger.warning("The breach %r already exists at %r", breach['name'], breach['id'])
         raise BreachNameAlreadyExists(breach['name'])
 
     # We don't need the ID, and it breaks Celery
     del breach['_id']
+
+    logger.info("Starting data breach import for %r", breach['id'])
 
     # Launch Celery Task and return its info and the breach to the caller.
     sig = load_data_breach.s(

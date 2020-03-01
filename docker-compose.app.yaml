@@ -24,6 +24,7 @@ services:
       - setup
     volumes:
       - ./config.json:/app/config.json
+      - ./data_breaches:/data_breaches
   celery:
     build:
       context: .
