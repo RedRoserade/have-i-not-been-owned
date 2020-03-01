@@ -1,11 +1,11 @@
 import pymongo
 
-from have_i_not_been_owned.common.config import db_url
+from have_i_not_been_owned.common.config import mongo
 
 
 def get_db(url: str = None):
     if url is None:
-        url = db_url
+        url = mongo['url']
 
     client = pymongo.MongoClient(url)
 

@@ -10,6 +10,7 @@ from have_i_not_been_owned.api.exceptions import BreachNameAlreadyExists
 from have_i_not_been_owned.celery import app
 from have_i_not_been_owned.celery.tasks import load_data_breach
 from have_i_not_been_owned.common.celery.utils import read_async_result
+from have_i_not_been_owned.common.config import cos
 from have_i_not_been_owned.common.db import get_data_breaches_collection
 from have_i_not_been_owned.common.s3 import create_presigned_post, create_presigned_url
 from have_i_not_been_owned.common.utils.text import slugify
@@ -22,7 +23,9 @@ def prepare_data_breach_upload_url(body):
         # In theory it should never happen as we have schema validation
         raise BadRequest()
 
-    key = f'data_breach_uploads/{uuid.uuid4()}/{file_name}'
+    data_breaches_base_key = cos['data_breach_uploads']['key_prefix']
+
+    key = f'{data_breaches_base_key}/{uuid.uuid4()}/{file_name}'
 
     # We need two URLs, one to do the upload, and one to then download (on the task)
     signed_post = create_presigned_post(key)

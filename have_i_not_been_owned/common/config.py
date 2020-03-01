@@ -1,8 +1,10 @@
 import os
 
-db_url = os.getenv('HINBO_DB_URL', 'mongodb://localhost/hinbo')
+mongo = {
+    'url': os.getenv('HINBO_DB_URL', 'mongodb://localhost/hinbo')
+}
 
-s3 = {
+cos = {
     'resource_credentials': {
         'endpoint_url': os.getenv('HINBO_S3_ENDPOINT_URL', 'http://localhost:9000'),
         'aws_access_key_id': os.getenv('HINBO_S3_ACCESS_KEY_ID', 'ACCESS'),
@@ -10,5 +12,9 @@ s3 = {
     },
     'bucket': {
         'bucket_name': os.getenv('HINBO_S3_BUCKET', 'hinbo'),
+    },
+    'data_breach_uploads': {
+        'key_prefix': 'data_breach_uploads',
+        'expiration_days': 30,
     },
 }
