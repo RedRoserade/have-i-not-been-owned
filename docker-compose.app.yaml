@@ -1,0 +1,37 @@
+version: '2'
+services:
+  # Container for running the db and cos setup scripts
+  setup:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: have-i-not-been-owned
+    command: ["run-setup"]
+    depends_on:
+      - mongo
+      - cos
+    volumes:
+      - ./config.json:/app/config.json
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: have-i-not-been-owned
+    command: ["run-api"]
+    ports:
+      - 8080:8080
+    depends_on:
+      - setup
+    volumes:
+      - ./config.json:/app/config.json
+  celery:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: have-i-not-been-owned
+    command: ["run-celery"]
+    depends_on:
+      - redis
+      - rabbit
+    volumes:
+      - ./config.json:/app/config.json

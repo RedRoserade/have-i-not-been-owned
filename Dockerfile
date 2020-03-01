@@ -25,7 +25,11 @@ WORKDIR /app
 
 COPY --chown=hinbo:hinbo .docker/docker-entrypoint.sh /usr/local/bin
 
-COPY --chown=hinbo:hinbo have_i_not_been_owned .
+COPY --chown=hinbo:hinbo have_i_not_been_owned/ have_i_not_been_owned
+COPY --chown=hinbo:hinbo scripts/ scripts
 
-CMD ["gosu", "hinbo:hinbo", "docker-entrypoint.sh"]
+ENV HINBO_CONFIG_FILE=/app/config.json
 
+VOLUME ${HINBO_CONFIG_FILE}
+
+ENTRYPOINT ["gosu", "hinbo:hinbo", "docker-entrypoint.sh"]

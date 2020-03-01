@@ -1,3 +1,4 @@
+import json
 import os
 
 mongo = {
@@ -18,3 +19,26 @@ cos = {
         'expiration_days': 30,
     },
 }
+
+amqp = {
+    "url": os.getenv('HINBO_BROKER_URL', 'amqp://localhost:5672')
+}
+
+redis = {
+    "url": os.getenv('HINBO_RESULT_BACKEND', 'redis://localhost:6379/0')
+}
+
+
+def _read_config():
+    config_file_location = os.getenv('HINBO_CONFIG_FILE', 'config.json')
+
+    with open(config_file_location, 'r') as config_file_reader:
+        config = json.load(config_file_reader)
+
+    mongo.update(config['mongo'])
+    cos.update(config['cos'])
+    amqp.update(config['amqp'])
+    redis.update(config['redis'])
+
+
+_read_config()

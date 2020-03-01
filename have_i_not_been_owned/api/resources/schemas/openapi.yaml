@@ -8,6 +8,8 @@ servers:
 paths:
   /data_breaches/upload_url:
     post:
+      tags:
+        - Data Breaches
       x-openapi-router-controller: have_i_not_been_owned.api.controllers.data_breaches_controller
       operationId: prepare_data_breach_upload_url
       description: Prepare an upload URL for a data breach
@@ -35,6 +37,8 @@ paths:
                   - get
   /data_breaches:
     post:
+      tags:
+        - Data Breaches
       x-openapi-router-controller: have_i_not_been_owned.api.controllers.data_breaches_controller
       operationId: process_data_breach
       description: Process a data breach from a URL with data.
@@ -53,6 +57,8 @@ paths:
                 $ref: '#/components/schemas/TaskStatus'
   /tasks/{task_id}:
     get:
+      tags:
+        - Tasks
       x-openapi-router-controller: have_i_not_been_owned.api.controllers.tasks_controller
       operationId: get_task_status
       description: Get the status of a Task. Note that this will return `PENDING` for celery that don't exist or haven't started yet.
@@ -71,6 +77,8 @@ paths:
                 $ref: '#/components/schemas/TaskStatus'
   /breached_emails/{email}:
     get:
+      tags:
+        - Breached Emails
       x-openapi-router-controller: have_i_not_been_owned.api.controllers.breached_emails_controller
       operationId: get_breached_email
       parameters:
@@ -95,6 +103,8 @@ paths:
                 $ref: '#/components/schemas/Problem'
   /email_domains/{domain}:
     get:
+      tags:
+        - Email Domains
       x-openapi-router-controller: have_i_not_been_owned.api.controllers.breached_emails_controller
       operationId: get_breached_domain
       parameters:

@@ -1,13 +1,18 @@
 #!/usr/bin/env bash
 
-set -eu
+set -e
 
-HINBO_RUN_SETUP="${HINBO_RUN_SETUP:-1}"
-
-if [[ "${HINBO_RUN_SETUP}" == "1" ]]; then
-  echo "Running setup"
-
-  python -m have_i_not_been_owned.scripts.setup_db
-  python -m have_i_not_been_owned.scripts.setup_s3
-fi
-
+case "${1}" in
+  run-setup)
+    exec ./scripts/run-setup.sh
+    ;;
+  run-celery)
+    exec ./scripts/run-celery.sh
+    ;;
+  run-api)
+    exec ./scripts/run-api.sh
+    ;;
+  *)
+    echo "Unknown option '${1}', valid options are 'run-setup', 'run-celery', 'run-api'"
+    exit 1
+esac

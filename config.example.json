@@ -1,0 +1,25 @@
+{
+  "mongo": {
+    "url": "mongodb://mongo/hinbo"
+  },
+  "cos": {
+    "resource_credentials": {
+      "endpoint_url": "http://cos:9000",
+      "aws_access_key_id": "ACCESS",
+      "aws_secret_access_key": "SuperS3cret"
+    },
+    "bucket": {
+      "bucket_name": "hinbo"
+    },
+    "data_breach_uploads": {
+        "key_prefix": "data_breach_uploads",
+        "expiration_days": 30
+    }
+  },
+  "amqp": {
+    "url": "amqp://rabbit:5672"
+  },
+  "redis": {
+    "url": "redis://redis:6379/0"
+  }
+}
