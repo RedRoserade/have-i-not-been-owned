@@ -58,10 +58,8 @@ def process_data_breach(body):
         logger.warning("The breach %r already exists at %r", breach['name'], breach['id'])
         raise BreachNameAlreadyExists(breach['name'])
 
-    # We don't need the ID, and it breaks Celery
+    # We don't need the ID, and it breaks Celery JSON serialization
     del breach['_id']
-
-    logger.info("Starting data breach import for %r", breach['id'])
 
     # Launch Celery Task and return its info and the breach to the caller.
     sig = load_data_breach.s(
@@ -71,6 +69,8 @@ def process_data_breach(body):
 
     # HACK for some damn reason the `apply_async` is returning the default Celery App with no backend.
     result = app.AsyncResult(sig.apply_async().id)
+
+    logger.debug("Starting data breach import for %r. Task id is %r", breach['id'], result.id)
 
     return {
         'breach': breach,

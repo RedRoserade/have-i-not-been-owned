@@ -60,6 +60,8 @@ def _process_breach_file(breach_file: str, breach: dict):
     domains_cache = set()
 
     def dump_domains():
+        logger.debug("Dumping %r domains...", len(domains_cache))
+
         domain_bulk = [
             UpdateOne(
                 {'domain': domain},
@@ -85,13 +87,19 @@ def _process_breach_file(breach_file: str, breach: dict):
             matched=result.matched_count,
         )
 
+        logger.debug("Current domain totals: %r", domain_totals)
+
     def dump_emails():
+        logger.debug("Dumping %r emails...", len(email_address_bulk))
+
         result = breached_emails.bulk_write(email_address_bulk, ordered=False)
 
         email_totals.update(
             processed=len(email_address_bulk),
             matched=result.matched_count,
         )
+
+        logger.debug("Current email totals: %r", email_totals)
 
     with open(breach_file, 'r') as breach_file_reader:
         for line in breach_file_reader.readlines():
