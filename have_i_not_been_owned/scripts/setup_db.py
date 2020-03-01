@@ -58,4 +58,6 @@ def _setup_breaches_collection(db):
 
 
 if __name__ == '__main__':
+    logging.basicConfig(level=logging.WARNING)
+    logger.setLevel(logging.INFO)
     main()

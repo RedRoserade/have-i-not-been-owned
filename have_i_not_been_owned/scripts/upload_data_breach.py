@@ -26,7 +26,7 @@ def main():
         logger.error('Task %r failed with status %r', task['task_id'], task['state'])
         raise SystemExit(1)
     else:
-        logger.info('Task %r finished successfully.')
+        logger.info('Task %r finished successfully.', task['task_id'])
 
 
 def _get_args():

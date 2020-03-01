@@ -11,6 +11,8 @@ celery = {extras = ["redis"],version = "*"}
 requests = "*"
 pymongo = "*"
 boto3 = "*"
+gunicorn = "*"
+gevent = "*"
 
 [requires]
 python_version = "3.7"
