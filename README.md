@@ -65,3 +65,52 @@ This script will error out if a breach already exists for the given name.
 
 - Docker
 - Docker Compose
+
+# Running locally
+
+You can run this outside Docker, provided you have Python 3.7 and `pipenv` installed.
+
+Run `pipenv install` to set things up. It is recommended you use `pipenv`'s Virtual Environment support.
+
+## Dependencies
+
+- A MongoDB instance
+- An Object Storage instance, such as Minio
+- An AMQP instance, such as RabbitMQ
+- A Redis instance
+
+Configure those in `config.json` (you may use `config.example.json` as a base)
+
+Alternatively, use `docker-compose.deps.yaml`. All services map into their default local ports.
+
+## Setting things up
+
+To set things up on the DB and COS, run the following commands:
+
+```bash
+python -m have_i_not_been_owned.scripts.setup_s3
+python -m have_i_not_been_owned.scripts.setup_db
+```
+
+## Running the API
+
+Run the following command:
+
+```bash
+python -m have_i_not_been_owned.api
+```
+
+It'll be available on port 5000
+
+## Running the Celery workers
+
+Run the following command:
+
+```bash
+celery -A have_i_not_been_owned.celery worker -c 4 -l INFO
+```
+
+## Alternative scripts
+
+The `scripts/` directory has shell scripts you can use instead. Do mind that the API one will use `gunicorn` rather than the Flask development server.
+I prefer the latter whenever possible for debugging purposes.

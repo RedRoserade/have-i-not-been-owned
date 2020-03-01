@@ -61,7 +61,7 @@ paths:
         - Tasks
       x-openapi-router-controller: have_i_not_been_owned.api.controllers.tasks_controller
       operationId: get_task_status
-      description: Get the status of a Task. Note that this will return `PENDING` for celery that don't exist or haven't started yet.
+      description: Get the status of a Task. Note that this will return `PENDING` for tasks that don't exist or haven't started yet.
       parameters:
         - name: task_id
           in: path

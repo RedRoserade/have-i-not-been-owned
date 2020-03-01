@@ -21,6 +21,7 @@ services:
     ports:
       - 8080:8080
     depends_on:
+      # Only start the API once the setup finishes.
       - setup
     volumes:
       - ./config.json:/app/config.json
