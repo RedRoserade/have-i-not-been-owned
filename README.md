@@ -100,7 +100,7 @@ Run the following command:
 python -m have_i_not_been_owned.api
 ```
 
-It'll be available on port 5000
+It'll be available on port `5000`. The Swagger docs are, therefore, at [http://localhost:5000/api/v1/ui/](http://localhost:5000/api/v1/ui/).
 
 ## Running the Celery workers
 
@@ -109,6 +109,18 @@ Run the following command:
 ```bash
 celery -A have_i_not_been_owned.celery worker -c 4 -l INFO
 ```
+
+## Uploading a data breach
+
+Run the following command:
+
+```bash
+python -m have_i_not_been_owned.scripts.upload_data_breach \
+    --file /path/to/dataleaks_sample/file.txt \
+    --name "Sample Leak"
+```
+
+You may need to use the `--api` command line argument if you're using a port other than `5000`.
 
 ## Alternative scripts
 
