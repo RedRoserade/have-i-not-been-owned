@@ -48,6 +48,8 @@ def get_breached_domain(domain: str, after: str = None, limit: int = 100):
     # TODO This is expensive, and should be cached.
     total_breached_emails = breached_emails.count_documents(domain_query)
 
+    # Do pagination relying on the _id index instead of skip + limit. This avoids collection scans,
+    # at the cost of random access support to the collection.
     if after is not None:
         domain_query['_id'] = {'$gt': ObjectId(after)}
 

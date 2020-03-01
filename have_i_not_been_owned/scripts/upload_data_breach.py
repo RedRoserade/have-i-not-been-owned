@@ -32,11 +32,17 @@ def main():
 def _get_args():
     parser = argparse.ArgumentParser(description='Upload data breach')
 
-    parser.add_argument('--file', required=True)
-    parser.add_argument('--name', required=True)
-    parser.add_argument('--api', default='http://localhost:5000/api/v1/')
+    parser.add_argument('--file', required=True, help="Path to the file to be uploaded with the data.")
+    parser.add_argument('--name', required=True, help="Name of the breach.")
+    parser.add_argument('--api', default='http://localhost:5000/api/v1/', help="API base path.")
 
-    return parser.parse_args()
+    args = parser.parse_args()
+
+    # Ensure that the API base path always ends with a '/' to handle urljoin semantics.
+    if args.api[-1] != '/':
+        args.api += '/'
+
+    return args
 
 
 def _get_signed_urls(args):
@@ -51,6 +57,7 @@ def _get_signed_urls(args):
 
 def _upload_breach_file(args) -> str:
     logger.info("Uploading breach file...")
+
     with open(args.file, 'rb') as breach_file_reader:
         signed_urls = _get_signed_urls(args)
 
@@ -58,6 +65,7 @@ def _upload_breach_file(args) -> str:
         files = {'file': (post['fields']['key'], breach_file_reader)}
 
         response = requests.post(post['url'], data=post['fields'], files=files)
+
     response.raise_for_status()
 
     return signed_urls['get']

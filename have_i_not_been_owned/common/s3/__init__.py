@@ -1,5 +1,4 @@
 import boto3
-from botocore.exceptions import ClientError
 
 from have_i_not_been_owned.common.config import cos
 

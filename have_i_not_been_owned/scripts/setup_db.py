@@ -21,12 +21,14 @@ def _setup_breached_emails_collection(db):
 
     coll = get_breached_emails_collection(db)
 
+    # Create a surrogate key on the email to detect duplicates
     coll.create_index(
         keys=[('email', 1)],
         unique=True,
         name='email_asc_unique'
     )
 
+    # Helps querying emails by domain
     coll.create_index(
         keys=[('domain', 1)],
         name='domain_asc'
@@ -53,7 +55,7 @@ def _setup_breaches_collection(db):
     coll.create_index(
         keys=[('id', 1)],
         unique=True,
-        name='domain_asc_unique'
+        name='id_asc_unique'
     )
 
 
